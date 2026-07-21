@@ -14,31 +14,12 @@ the NCHS / CDC.
 ```
 Patient_segmentation/
 │
-├── data/                 # Dataset files (NHANES CSV, data dictionary, problem statement)
-│   ├── ML3_data.csv
-│   ├── Data_Description.xlsx
-│   └── ML3_cluster_problemDoc.docx
 │
-├── images/               # Plots, visualizations, and figures (auto-exported by the notebook)
-│   ├── fig_01.png … fig_35.png
-│   └── pca_3d_clusters.html   # interactive 3-D PCA cluster viewer
+├── notebooks/            # Jupyter notebook for analysis and experimentation
+│   ├── NHANES_Patient_Segmentation_PROGRESS.ipynb   
 │
-├── logs/                 # Training and application logs
-│   └── run.log
 │
-├── models/               # Saved trained models + artefacts
-│   ├── minmax_scaler.joblib
-│   ├── pca_95.joblib
-│   ├── kmeans_final.joblib
-│   ├── model_metadata.json
-│   ├── patient_cluster_assignments.csv
-│   └── cluster_profiles.csv
-│
-├── notebooks/            # Jupyter notebooks for analysis and experimentation
-│   ├── NHANES_Patient_Segmentation.ipynb   # the full 22-section analysis
-│   └── build_nb.py                         # reproducible notebook builder script
-│
-├── README.md             # This file
+├── README.md             
 └── requirements.txt      # Python dependencies
 ```
 
@@ -79,7 +60,7 @@ any dimensionality reduction must retain **≥ 95 %** of variance.
 7. **K-Means clustering** + clinical profiling & rule-based naming.
 8. **PCA** (retain ≥95 % variance) + re-clustering; **DBSCAN**; **Agglomerative / GMM / Spectral**.
 9. **Validation** — consolidated internal-metric comparison.
-10. **Healthcare insights, limitations, future work, conclusion, appendix.**
+10. **Healthcare insights, conclusion, appendix.**
 
 ---
 
@@ -116,31 +97,3 @@ cd notebooks
 python3 -m nbconvert --to notebook --execute --inplace \
         --ExecutePreprocessor.timeout=600 NHANES_Patient_Segmentation.ipynb
 ```
-
-The notebook automatically writes figures to `images/`, logs to `logs/run.log`, and trained models
-to `models/`. To rebuild the notebook from scratch: `python3 notebooks/build_nb.py`.
-
-### Reusing the trained model
-```python
-import joblib
-scaler = joblib.load('models/minmax_scaler.joblib')
-pca    = joblib.load('models/pca_95.joblib')
-kmeans = joblib.load('models/kmeans_final.joblib')
-# new_patients: DataFrame with the 23 feature columns (see models/model_metadata.json)
-segments = kmeans.predict(pca.transform(scaler.transform(new_patients)))
-```
-
----
-
-## ⚠️ Limitations
-Cross-sectional data (association, not causation) · unweighted (survey weights not applied) · median
-imputation compresses variance · no exam data (BP/BMI) · K-Means imposes convex boundaries on a
-continuum. See the notebook's Limitations section for detail.
-
-## 🔭 Future Work
-UMAP / t-SNE embeddings · HDBSCAN · deep clustering (autoencoders / DEC) · Self-Organizing Maps ·
-survey-weighted & longitudinal clustering.
-
----
-
-*Software: Python 3, Jupyter. See `requirements.txt` for exact versions.*
